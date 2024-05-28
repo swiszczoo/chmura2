@@ -1,0 +1,45 @@
+version: '3.4'
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      FORCE_COLOR: 1
+      NODE_ENV: development
+      TZ: Europe/Warsaw
+    volumes:
+      - "./backend:/usr/src/app:cached"
+      - "/etc/localtime:/etc/localtime:ro"
+    ports:
+      - 3000:3000
+    depends_on:
+      - mariadb
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      FORCE_COLOR: 1
+      NODE_ENV: development
+    ports:
+      - 5173:5173
+    volumes:
+      - "./frontend:/usr/src/app:cached"
+    depends_on:
+      - backend
+    profiles:
+      - donotstart
+      
+  mariadb:
+    command: --init-file /data/application/init.sql
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql-init.sql:/data/application/init.sql:ro
+      - mariadb:/var/lib/mysql
+
+volumes:
+  mariadb:
