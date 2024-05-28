@@ -28,7 +28,7 @@ function App() {
 
   const handleDownloadClick = (index: number) => {
     const a = document.createElement('a');
-    a.href = data[index].s3link;
+    a.href = `/api/files/${data[index].id}/download`;
     a.target = '_blank';
     document.body.appendChild(a);
     a.click();

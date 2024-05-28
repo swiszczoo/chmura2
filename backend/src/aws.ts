@@ -1,4 +1,4 @@
-import { ListBucketsCommand, PutBucketPolicyCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutBucketPolicyCommand, S3Client } from "@aws-sdk/client-s3";
 
 console.log(`Key id: ${process.env.AWS_ACCESS_KEY_ID}`);
 

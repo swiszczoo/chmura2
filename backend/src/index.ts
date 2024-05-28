@@ -11,8 +11,8 @@ import s3 from './aws';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 
-import { DeleteObjectCommand } from '@aws-sdk/client-s3';
-
+import { DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 myDataSource
   .initialize()
@@ -52,6 +52,26 @@ app.get('/api/files/:id', async (req: Request, res: Response) => {
   } else {
     res.status(404).send('');
   }
+});
+
+app.get('/api/files/:id/download', async (req: Request, res: Response) => {
+  const file = await FileRepository.findOneBy({ id: parseInt(req.params.id) });
+  if (!file) {
+    res.status(404).send('');
+    return;
+  }
+
+  const command = new GetObjectCommand({
+    Bucket: bucketName,
+    Key: file.s3key,
+    ResponseContentDisposition: `attachment; filename=${file.filename}`
+  });
+
+  const url = await getSignedUrl(s3, command, {
+    expiresIn: 3600,
+  });
+
+  res.redirect(302, url);
 });
 
 app.patch('/api/files/:id', async (req: Request, res: Response) => {
